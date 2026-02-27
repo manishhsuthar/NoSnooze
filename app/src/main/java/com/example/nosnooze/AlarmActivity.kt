@@ -10,42 +10,54 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.nosnooze.ui.theme.NoSnoozeTheme
 
 class AlarmActivity : ComponentActivity() {
 
-    private lateinit var mediaPlayer: MediaPlayer
+    private var mediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound)
-        mediaPlayer.isLooping = true
-        mediaPlayer.start()
+        try {
+            mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound)
+            mediaPlayer?.isLooping = true
+            mediaPlayer?.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         setContent {
-            MathChallenge {
-                mediaPlayer.stop()
-                mediaPlayer.release()
-                finish()
+            NoSnoozeTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MathChallenge {
+                        mediaPlayer?.stop()
+                        mediaPlayer?.release()
+                        mediaPlayer = null
+                        finish()
+                    }
+                }
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::mediaPlayer.isInitialized) {
-            mediaPlayer.release()
-        }
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 }
 
 @Composable
 fun MathChallenge(onSuccess: () -> Unit) {
 
-    var correctCount by remember { mutableStateOf(0) }
+    var correctCount by remember { mutableIntStateOf(0) }
 
-    var num1 by remember { mutableStateOf((1..50).random()) }
-    var num2 by remember { mutableStateOf((1..50).random()) }
+    var num1 by remember { mutableIntStateOf((1..50).random()) }
+    var num2 by remember { mutableIntStateOf((1..50).random()) }
 
     var userAnswer by remember { mutableStateOf("") }
 
@@ -57,11 +69,11 @@ fun MathChallenge(onSuccess: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text("Solve 3 Math Problems to Stop Alarm")
+        Text("Solve 3 Math Problems to Stop Alarm", style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("$num1 + $num2 = ?")
+        Text("$num1 + $num2 = ?", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -93,6 +105,6 @@ fun MathChallenge(onSuccess: () -> Unit) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("Correct Answers: $correctCount / 3")
+        Text("Correct Answers: $correctCount / 3", style = MaterialTheme.typography.bodyLarge)
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.nosnooze.ui.theme.NoSnoozeTheme
 import java.util.*
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +23,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AlarmScreen()
+            NoSnoozeTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AlarmScreen()
+                }
+            }
         }
     }
 }
